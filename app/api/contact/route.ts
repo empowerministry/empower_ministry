@@ -7,6 +7,15 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
+    // Check if API key is configured
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is not configured')
+      return NextResponse.json(
+        { error: 'Email service not configured' },
+        { status: 500 }
+      )
+    }
+
     const body = await request.json()
     const { name, email, message } = body
 
@@ -30,7 +39,7 @@ export async function POST(request: Request) {
     if (error) {
       console.error('Resend error:', error)
       return NextResponse.json(
-        { error: 'Failed to send email' },
+        { error: 'Failed to send email', details: error.message },
         { status: 500 }
       )
     }
@@ -42,7 +51,10 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('API route error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }
