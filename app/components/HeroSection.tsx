@@ -1,66 +1,81 @@
 "use client"
 
-import { motion } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
+import Hero1 from '../../public/XAN01482.jpg'
+import Hero2 from '../../public/XAN01606.jpg'
+import Hero3 from '../../public/XAN01849.jpg'
+import Hero4 from '../../public/XAN01856.jpg' 
+
+const slides = [
+  '/XAN01849.jpg',
+  '/XAN01856.jpg',
+  '/XAN01482.jpg',
+  '/XAN01606.jpg',
+]
 
 export default function HeroSection() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   const scrollToNext = () => {
     document.getElementById('who-we-are')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
-      {/* Video Background */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover"
-        poster="/grass_placeholder.jpg"
-      >
-        <source
-          src="/grass.mp4"
-          type="video/mp4"
+    <section className="relative h-[70vh] md:h-[75vh] w-full overflow-hidden">
+      {/* Slideshow Background */}
+      <AnimatePresence mode="wait">
+        <motion.img
+          key={currentSlide}
+          src={slides[currentSlide]}
+          alt="AYP.ME"
+          initial={{ opacity: .7, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 4 }}
+          className="absolute inset-0 w-full h-full object-cover"
         />
-      </video>
+      </AnimatePresence>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1e3a5f]/70 via-[#1e3a5f]/70 to-[#1e3a5f]/70" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1e3a5f]/50 via-[#1e3a5f]/30 to-[#1e3a5f]/50" />
 
       {/* Content */}
-      <div className="
-        relative z-10 h-full flex flex-col items-center
-        justify-start pt-72
-        md:justify-center md:pt-0
-        px-6
-        ">
+      <div className="relative z-10 h-full flex flex-col items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className="text-center"
         >
-          {/* Tagline */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-[#c9a227] uppercase tracking-[0.3em] text-sm md:text-base mb-4 font-medium"
+          {/* Logo */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mb-8"
           >
-            Empower Ministry Group
-          </motion.p>
+            
+          </motion.div>
 
-          {/* Main Headline */}
+          {/* Main Headline - Empower Ministry (larger) */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.6 }}
             className="text-4xl md:text-6xl lg:text-7xl font-light text-white tracking-tight leading-tight"
           >
-            Creating Ministry
+            Empower
             <br />
-            <span className="font-semibold">Possibilities</span>
+            <span className="font-semibold">Ministry Group</span>
           </motion.h1>
 
           <motion.div
@@ -69,6 +84,16 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 1 }}
             className="w-24 h-0.5 bg-[#c9a227] mx-auto mt-8"
           />
+
+          {/* Tagline - Creating Ministry Possibilities (smaller) */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-[#c9a227] uppercase tracking-[0.3em] text-sm md:text-base mt-4 font-medium"
+          >
+            Creating Ministry Possibilities
+          </motion.p>
         </motion.div>
 
         {/* Scroll Indicator */}
@@ -77,13 +102,13 @@ export default function HeroSection() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 1.5 }}
           onClick={scrollToNext}
-          className="absolute bottom-52 md:bottom-20 left-1/2 -translate-x-1/2 text-white/70 hover:text-white transition-colors"
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 text-white/70 hover:text-white transition-colors"
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <ChevronDown className="w-15 h-15" />
+            <ChevronDown className="w-8 h-8" />
           </motion.div>
         </motion.button>
       </div>

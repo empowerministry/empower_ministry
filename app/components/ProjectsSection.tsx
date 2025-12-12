@@ -13,30 +13,33 @@ const projects = [
     title: 'East Coast Korean Camp Meeting',
     category: 'Event',
     description: 'Annual social and spiritual gathering for the Korean community on the East Coast.',
-    longDescription: 'Our flagship community program works with over 30 local churches to identify and serve families in need. We provide food assistance, clothing drives, job training resources, and spiritual counseling. Each year, we reach over 2,000 families, helping them build stronger foundations for their futures.',
-    image: 'https://lh3.googleusercontent.com/proxy/U7kHTS1TVOn9cRqMRBtK-d1PuXwGqJIn8bNTLZ8MyzFVP8MQoEy_UsnygcnKBXTZXoarYdYoIHejDaZpX7WK8-waaliEKuM',
+    longDescription: 'East Coast Campmeeting is a week-long retreat that brings together Korean churches from across the eastern United States. The gathering provides a dedicated time for fellowship, shared activities, spiritual renewal, and biblical education. The purpose of the retreat is to strengthen community among believers on the East Coast and to deepen our collective relationship with God.',
+    image: '/eckcm.jpg',
     impact: '1,000+ families served annually',
     location: 'Johnstown University, PA',
+    link: 'https://eckcm.com', // Add your link here
   },
   {
     id: 2,
     title: 'West Coast Korean Camp Meeting',
     category: 'Event',
     description: 'Annual social and spiritual gathering for the Korean community on the West Coast.',
-    longDescription: 'Our flagship community program works with over 30 local churches to identify and serve families in need. We provide food assistance, clothing drives, job training resources, and spiritual counseling. Each year, we reach over 2,000 families, helping them build stronger foundations for their futures.',
+    longDescription: 'West Coast Korean Camp Meeting is a collaborative event amongst the Korean-American Seventh-day Adventist Churches across the western states of America. Its purpose is to exalt the Lord Jesus Christ by experiencing the synergy of a united church community, discipling our leaders and members, and influencing the trend and patterns of our individual Korean churches across America.',
     image: 'https://storage.googleapis.com/production-mydomaincom-v1-0-0/070/1762070/zTIthe1J/8dcb68546650402e9658c3d3de1436bf',
     impact: '1,000+ families served annually',
     location: 'Nationwide',
+    link: 'https://wckcm.org', // Add your link here
   },
   {
     id: 3,
-    title: 'Spiritual Innovation Lab for Young Leaders',
-    category: 'Ledership Development',
+    title: 'Youth Leadership Program',
+    category: 'Education',
     description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
     longDescription: 'Our comprehensive youth program identifies promising young leaders aged 16-25 and provides them with biblical training, leadership development workshops, and real-world ministry experience. Graduates of our program have gone on to serve in churches across the nation and around the world.',
-    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
+    image: 'https://plus.unsplash.com/premium_photo-1715588660901-f559d25356e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     impact: '500+ leaders trained',
     location: 'Nationwide',
+    link: '#', // Add your link here
   },
 ]
 
@@ -44,7 +47,7 @@ export default function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null)
 
   return (
-    <section className="py-24 md:py-32 bg-white">
+    <section className="py-14 md:py-22 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <motion.div
@@ -176,9 +179,9 @@ export default function ProjectsSection() {
                     </div>
                   </div>
                   <div className="mt-8 flex gap-4">
-                    <Link href="/donate" className="flex-1">
+                    <Link href={selectedProject.link} target="_blank" rel="noopener noreferrer" className="flex-1">
                       <Button className="w-full bg-[#c9a227] hover:bg-[#b8922a] text-white h-12 rounded-xl">
-                        Support This Project
+                        Learn More / Support
                       </Button>
                     </Link>
                     <Button

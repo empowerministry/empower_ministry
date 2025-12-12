@@ -23,7 +23,7 @@ const values = [
 
 export default function WhoWeAre() {
   return (
-    <section id="who-we-are" className="py-24 md:py-32 bg-[#faf8f5]">
+    <section id="who-we-are" className="py-14 md:py-22 bg-[#faf8f5]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}

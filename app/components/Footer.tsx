@@ -32,7 +32,8 @@ export default function Footer() {
       const data = await res.json()
 
       if (!res.ok) {
-        console.error(data.error)
+        console.error("API error:", data)
+        alert(`Error: ${data.error || 'Failed to send message'}`)
         setIsSubmitting(false)
         return
       }
@@ -43,15 +44,17 @@ export default function Footer() {
       setIsSubmitted(true)
 
     } catch (err) {
-      console.error(err)
+      console.error("Request failed:", err)
+      alert('Failed to send message. Please try again.')
       setIsSubmitting(false)
     }
   }
 
+
   return (
     <footer className="bg-[#1e3a5f]">
       {/* Contact Section */}
-      <div className="py-24 md:py-32">
+      <div className="py-14 md:py-22">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16">
             {/* Left - Contact Info */}

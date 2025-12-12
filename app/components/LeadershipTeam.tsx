@@ -32,7 +32,7 @@ const leaders = [
 
 export default function LeadershipTeam() {
   return (
-    <section className="py-24 md:py-32 bg-[#faf8f5]">
+    <section className="py-14 md:py-22 bg-[#faf8f5]">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <motion.div

@@ -16,10 +16,11 @@ const projects = [
     category: 'Event',
     icon: Calendar,
     description: 'Annual social and spiritual gathering for the Korean community on the East Coast.',
-    longDescription: 'Our flagship community program works with over 30 local churches to identify and serve families in need. We provide food assistance, clothing drives, job training resources, and spiritual counseling. Each year, we reach over 2,000 families, helping them build stronger foundations for their futures.',
-    image: 'https://lh3.googleusercontent.com/proxy/U7kHTS1TVOn9cRqMRBtK-d1PuXwGqJIn8bNTLZ8MyzFVP8MQoEy_UsnygcnKBXTZXoarYdYoIHejDaZpX7WK8-waaliEKuM',
+    longDescription: 'East Coast Campmeeting is a week-long retreat that brings together Korean churches from across the eastern United States. The gathering provides a dedicated time for fellowship, shared activities, spiritual renewal, and biblical education. The purpose of the retreat is to strengthen community among believers on the East Coast and to deepen our collective relationship with God.',
+    image: '/eckcm.jpg',
     impact: '1,000+ families served annually',
-    location: 'Johnstown University, PA',
+    location: 'University of Pittsburg at Johnstown, PA',
+    link: 'https://eckcm.com', // Add your link here
   },
   {
     id: 2,
@@ -27,10 +28,11 @@ const projects = [
     category: 'Event',
     icon: Calendar,
     description: 'Annual social and spiritual gathering for the Korean community on the West Coast.',
-    longDescription: 'Our flagship community program works with over 30 local churches to identify and serve families in need. We provide food assistance, clothing drives, job training resources, and spiritual counseling. Each year, we reach over 2,000 families, helping them build stronger foundations for their futures.',
+    longDescription: 'West Coast Korean Camp Meeting is a collaborative event amongst the Korean-American Seventh-day Adventist Churches across the western states of America. Its purpose is to exalt the Lord Jesus Christ by experiencing the synergy of a united church community, discipling our leaders and members, and influencing the trend and patterns of our individual Korean churches across America.',
     image: 'https://storage.googleapis.com/production-mydomaincom-v1-0-0/070/1762070/zTIthe1J/8dcb68546650402e9658c3d3de1436bf',
     impact: '1,000+ families served annually',
-    location: 'Nationwide',
+    location: 'Pacific Union College, CA',
+    link: 'https://wckcm.org', // Add your link here
   },
   {
     id: 3,
@@ -42,6 +44,7 @@ const projects = [
     image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80',
     impact: '2,000+ families served annually',
     location: 'Metro Atlanta Area',
+    link: '#', // Add your link here
   },
   {
     id: 4,
@@ -50,9 +53,10 @@ const projects = [
     icon: BookOpen,
     description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
     longDescription: 'Our comprehensive youth program identifies promising young leaders aged 16-25 and provides them with biblical training, leadership development workshops, and real-world ministry experience. Graduates of our program have gone on to serve in churches across the nation and around the world.',
-    image: 'https://www.heart.org/en/-/media/Images/Volunteer-Opportunities/High-School-and-College-Students/Start-a-Club/Youth_Leadership_Council.jpg?h=400&iar=0&mw=600&w=600&sc_lang=en',
+    image: 'https://plus.unsplash.com/premium_photo-1715588660901-f559d25356e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     impact: '500+ leaders trained',
     location: 'Nationwide',
+    link: '#', // Add your link here
   },
   {
     id: 5,
@@ -64,6 +68,7 @@ const projects = [
     image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
     impact: '50+ missionaries supported',
     location: '15 Countries',
+    link: '#', // Add your link here
   },
   {
     id: 6,
@@ -75,6 +80,7 @@ const projects = [
     image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80',
     impact: '10,000+ meals served',
     location: 'Downtown Atlanta',
+    link: '#', // Add your link here
   },
   {
     id: 7,
@@ -86,6 +92,7 @@ const projects = [
     image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80',
     impact: '300+ couples counseled',
     location: 'Regional Centers',
+    link: '#', // Add your link here
   },
   {
     id: 8,
@@ -97,6 +104,7 @@ const projects = [
     image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80',
     impact: '50,000 lbs food distributed',
     location: 'Metro Atlanta Area',
+    link: '#', // Add your link here
   },
   
   // {
@@ -290,9 +298,9 @@ export default function Projects() {
                   </div>
                 </div>
                 <div className="mt-8 flex gap-4">
-                  <Link href="/donate" className="flex-1">
+                  <Link href={selectedProject.link} target="_blank" rel="noopener noreferrer" className="flex-1">
                     <Button className="w-full bg-[#c9a227] hover:bg-[#b8922a] text-white h-12 rounded-xl">
-                      Support This Project
+                      Learn More / Support
                     </Button>
                   </Link>
                   <Button
