@@ -3,16 +3,13 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import Hero1 from '../../public/XAN01482.jpg'
-import Hero2 from '../../public/XAN01606.jpg'
-import Hero3 from '../../public/XAN01849.jpg'
-import Hero4 from '../../public/XAN01856.jpg' 
+
 
 const slides = [
-  '/XAN01849.jpg',
-  '/XAN01856.jpg',
-  '/XAN01482.jpg',
-  '/XAN01606.jpg',
+  '/AYP.ME.png',
+  '/eckcm.webp',
+  '/guitar.jpeg',
+  '/AYP.ME2.png',
 ]
 
 export default function HeroSection() {

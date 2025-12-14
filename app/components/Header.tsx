@@ -13,7 +13,7 @@ const navLinks = [
   { name: "Donate", path: "/donate" },
 ]
 
-export default function Header() {
+export default function HeroSection() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
