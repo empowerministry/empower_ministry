@@ -10,6 +10,8 @@ const slides = [
   '/eckcm.webp',
   '/guitar.jpeg',
   '/AYP.ME2.png',
+  '/XAN01441.webp',
+  '/XAN01589.webp',
 ]
 
 export default function HeroSection() {
@@ -29,15 +31,15 @@ export default function HeroSection() {
   return (
     <section className="relative h-[70vh] md:h-[75vh] w-full overflow-hidden">
       {/* Slideshow Background */}
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         <motion.img
           key={currentSlide}
           src={slides[currentSlide]}
           alt="AYP.ME"
-          initial={{ opacity: .7, scale: 1.05 }}
+          initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 4 }}
+          exit={{ opacity: 0, scale: 1 }}
+          transition={{ duration: 1.5 }}
           className="absolute inset-0 w-full h-full object-cover"
         />
       </AnimatePresence>

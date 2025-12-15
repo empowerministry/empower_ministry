@@ -10,25 +10,25 @@ import Image from 'next/image'
 const projects = [
   {
     id: 1,
-    title: 'East Coast Korean Camp Meeting',
+    title: 'Korean Camp Meetings',
     category: 'Event',
-    description: 'Annual social and spiritual gathering for the Korean community on the East Coast.',
-    longDescription: 'East Coast Campmeeting is a week-long retreat that brings together Korean churches from across the eastern United States. The gathering provides a dedicated time for fellowship, shared activities, spiritual renewal, and biblical education. The purpose of the retreat is to strengthen community among believers on the East Coast and to deepen our collective relationship with God.',
+    description: 'Providing infrastructure support for the Annual social and spiritual gathering for the Korean communities in the East and West Coast.',
+    longDescription: 'East Coast Campmeeting is a week-long retreat that brings together Korean churches from across the United States. The gathering provides a dedicated time for fellowship, shared activities, spiritual renewal, and biblical education. The purpose of the retreat is to strengthen community among believers on the East Coast and to deepen our collective relationship with God.',
     image: '/eckcm.jpg',
     impact: '1,000+ families served annually',
-    location: 'Johnstown University, PA',
-    link: 'https://eckcm.com', // Add your link here
+    location: 'Pennsylvania and California',
+    link: '#', // Add your link here
   },
   {
     id: 2,
-    title: 'West Coast Korean Camp Meeting',
-    category: 'Event',
-    description: 'Annual social and spiritual gathering for the Korean community on the West Coast.',
-    longDescription: 'West Coast Korean Camp Meeting is a collaborative event amongst the Korean-American Seventh-day Adventist Churches across the western states of America. Its purpose is to exalt the Lord Jesus Christ by experiencing the synergy of a united church community, discipling our leaders and members, and influencing the trend and patterns of our individual Korean churches across America.',
-    image: 'https://storage.googleapis.com/production-mydomaincom-v1-0-0/070/1762070/zTIthe1J/8dcb68546650402e9658c3d3de1436bf',
-    impact: '1,000+ families served annually',
+    title: 'Spiritual Innovation Lab',
+    category: 'Leadership Development',
+    description: 'Matching young leaders\' passions with innovative ministry opportunities to create lasting impact.',
+    longDescription: 'Our Spiritual Innovation Lab identifies promising young leaders and equips them with the resources, mentorship, and funding needed to launch innovative ministry projects that address contemporary challenges in our communities.',
+    image: '/AYP.ME.webp',
+    impact: 'Developing',
     location: 'Nationwide',
-    link: 'https://wckcm.org', // Add your link here
+    link: '#', // Add your link here
   },
   {
     id: 3,
@@ -37,7 +37,7 @@ const projects = [
     description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
     longDescription: 'Our comprehensive youth program identifies promising young leaders aged 16-25 and provides them with biblical training, leadership development workshops, and real-world ministry experience. Graduates of our program have gone on to serve in churches across the nation and around the world.',
     image: 'https://plus.unsplash.com/premium_photo-1715588660901-f559d25356e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    impact: '500+ leaders trained',
+    impact: 'Future leaders trained',
     location: 'Nationwide',
     link: '#', // Add your link here
   },

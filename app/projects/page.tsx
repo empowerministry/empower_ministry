@@ -18,7 +18,7 @@ const projects = [
     description: 'Annual social and spiritual gathering for the Korean community on the East Coast.',
     longDescription: 'East Coast Campmeeting is a week-long retreat that brings together Korean churches from across the eastern United States. The gathering provides a dedicated time for fellowship, shared activities, spiritual renewal, and biblical education. The purpose of the retreat is to strengthen community among believers on the East Coast and to deepen our collective relationship with God.',
     image: '/eckcm.jpg',
-    impact: '1,000+ families served annually',
+    impact: '1,000 participants annually',
     location: 'University of Pittsburg at Johnstown, PA',
     link: 'https://eckcm.com', // Add your link here
   },
@@ -30,7 +30,7 @@ const projects = [
     description: 'Annual social and spiritual gathering for the Korean community on the West Coast.',
     longDescription: 'West Coast Korean Camp Meeting is a collaborative event amongst the Korean-American Seventh-day Adventist Churches across the western states of America. Its purpose is to exalt the Lord Jesus Christ by experiencing the synergy of a united church community, discipling our leaders and members, and influencing the trend and patterns of our individual Korean churches across America.',
     image: 'https://storage.googleapis.com/production-mydomaincom-v1-0-0/070/1762070/zTIthe1J/8dcb68546650402e9658c3d3de1436bf',
-    impact: '1,000+ families served annually',
+    impact: '1,000+ participants annually',
     location: 'Pacific Union College, CA',
     link: 'https://wckcm.org', // Add your link here
   },
@@ -39,85 +39,86 @@ const projects = [
     title: 'Community Outreach Initiative',
     category: 'Community',
     icon: Users,
-    description: 'Connecting local churches with underserved neighborhoods to provide essential resources and spiritual guidance.',
-    longDescription: 'Our flagship community program works with over 30 local churches to identify and serve families in need. We provide food assistance, clothing drives, job training resources, and spiritual counseling. Each year, we reach over 2,000 families, helping them build stronger foundations for their futures.',
+    description: 'Partnering with local churches and ministries with resources to serve their communities.',
+    longDescription: 'We partner with compassion and service oriented local churches and ministry groups to make an impact within their local communities with short-term needs such as health clinics, neighborhood enrichment, and spiritual support.',
     image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80',
-    impact: '2,000+ families served annually',
-    location: 'Metro Atlanta Area',
-    link: '#', // Add your link here
-  },
-  {
-    id: 4,
-    title: 'Youth Leadership Program',
-    category: 'Education',
-    icon: BookOpen,
-    description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
-    longDescription: 'Our comprehensive youth program identifies promising young leaders aged 16-25 and provides them with biblical training, leadership development workshops, and real-world ministry experience. Graduates of our program have gone on to serve in churches across the nation and around the world.',
-    image: 'https://plus.unsplash.com/premium_photo-1715588660901-f559d25356e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    impact: '500+ leaders trained',
+    impact: 'Multiple Projects Annually',
     location: 'Nationwide',
     link: '#', // Add your link here
   },
   {
     id: 5,
-    title: 'Global Mission Support',
-    category: 'International',
-    icon: Globe,
-    description: 'Partnering with missionaries worldwide to expand their reach and amplify their impact.',
-    longDescription: 'We provide financial support, training resources, and administrative assistance to missionaries serving in challenging environments. Our network spans across 15 countries, supporting over 50 missionary families with monthly stipends, emergency funds, and regular care packages.',
-    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
-    impact: '50+ missionaries supported',
-    location: '15 Countries',
+    title: 'Youth Leadership Program',
+    category: 'Education',
+    icon: BookOpen,
+    description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
+    longDescription: 'Inspiring and mentoring future youth leaders and servants are the goals which founded our organization, and we continue to prioritize our strategic partnerships to enable life-changing programs directed toward identifying promising young leaders and providing biblical training, leadership development workshops, and real-world ministry experience.',
+    image: 'https://plus.unsplash.com/premium_photo-1715588660901-f559d25356e7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    impact: 'Generations of leaders trained',
+    location: 'Nationwide',
     link: '#', // Add your link here
   },
   {
     id: 6,
-    title: 'Homeless Ministry',
-    category: 'Humanitarian',
-    icon: HomeIcon,
-    description: 'Providing shelter, meals, and pathways to stability for those experiencing homelessness.',
-    longDescription: 'Our homeless ministry operates year-round, providing hot meals, warm clothing, and temporary shelter referrals. We partner with local shelters and transitional housing programs to help individuals find permanent housing and employment opportunities.',
-    image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80',
-    impact: '10,000+ meals served',
-    location: 'Downtown Atlanta',
+    title: 'Global Mission Support',
+    category: 'International',
+    icon: Globe,
+    description: 'Partnering with missionaries worldwide to expand their reach and amplify their impact.',
+    longDescription: 'We provide financial support, training resources, and administrative assistance to missionaries serving in challenging environments. Our goal is to empower these dedicated individuals to focus on their mission work while we help manage logistical and operational needs.',
+    image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
+    impact: 'Ongoing',
+    location: 'Globally',
     link: '#', // Add your link here
   },
-  {
-    id: 7,
-    title: 'Marriage & Family Ministry',
-    category: 'Community',
-    icon: Heart,
-    description: 'Strengthening marriages and families through counseling, workshops, and community support.',
-    longDescription: 'We believe strong families build strong communities. Our certified counselors provide pre-marital counseling, marriage enrichment retreats, and family therapy sessions. We also host monthly family nights that bring the community together.',
-    image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80',
-    impact: '300+ couples counseled',
-    location: 'Regional Centers',
-    link: '#', // Add your link here
-  },
-  {
-    id: 8,
-    title: 'Food Security Initiative',
-    category: 'Humanitarian',
-    icon: Utensils,
-    description: 'Fighting hunger through food banks, community gardens, and nutrition education.',
-    longDescription: 'Our food security program addresses hunger at multiple levels. We operate three community food banks, maintain urban gardens that provide fresh produce, and offer nutrition workshops to help families make the most of their resources.',
-    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80',
-    impact: '50,000 lbs food distributed',
-    location: 'Metro Atlanta Area',
-    link: '#', // Add your link here
-  },
-  
   // {
-  //   id: 9,
-  //   title: 'Spiritual Innovation Lab for Young Leaders',
-  //   category: 'Leadership Development',
-  //   icon: BookOpen,
-  //   description: 'Developing the next generation of ministry leaders through mentorship, training, and hands-on experience.',
-  //   longDescription: 'Our comprehensive youth program identifies promising young leaders aged 16-25 and provides them with biblical training, leadership development workshops, and real-world ministry experience. Graduates of our program have gone on to serve in churches across the nation and around the world.',
-  //   image: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&q=80',
-  //   impact: '500+ leaders trained',
-  //   location: 'Nationwide',
+  //   id: 6,
+  //   title: 'Homeless Ministry',
+  //   category: 'Humanitarian',
+  //   icon: HomeIcon,
+  //   description: 'Providing shelter, meals, and pathways to stability for those experiencing homelessness.',
+  //   longDescription: 'Our homeless ministry operates year-round, providing hot meals, warm clothing, and temporary shelter referrals. We partner with local shelters and transitional housing programs to help individuals find permanent housing and employment opportunities.',
+  //   image: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&q=80',
+  //   impact: '10,000+ meals served',
+  //   location: 'Downtown Atlanta',
+  //   link: '#', // Add your link here
   // },
+  // {
+  //   id: 7,
+  //   title: 'Marriage & Family Ministry',
+  //   category: 'Community',
+  //   icon: Heart,
+  //   description: 'Strengthening marriages and families through counseling, workshops, and community support.',
+  //   longDescription: 'We believe strong families build strong communities. Our certified counselors provide pre-marital counseling, marriage enrichment retreats, and family therapy sessions. We also host monthly family nights that bring the community together.',
+  //   image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80',
+  //   impact: '300+ couples counseled',
+  //   location: 'Regional Centers',
+  //   link: '#', // Add your link here
+  // },
+  // {
+  //   id: 8,
+  //   title: 'Food Security Initiative',
+  //   category: 'Humanitarian',
+  //   icon: Utensils,
+  //   description: 'Fighting hunger through food banks, community gardens, and nutrition education.',
+  //   longDescription: 'Our food security program addresses hunger at multiple levels. We operate three community food banks, maintain urban gardens that provide fresh produce, and offer nutrition workshops to help families make the most of their resources.',
+  //   image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80',
+  //   impact: '50,000 lbs food distributed',
+  //   location: 'Metro Atlanta Area',
+  //   link: '#', // Add your link here
+  // },
+  
+  {
+    id: 4,
+    title: 'Spiritual Innovation Lab for Young Leaders',
+    category: 'Leadership Development',
+    icon: BookOpen,
+    description: 'Matching young leaders\' passions with innovative ministry opportunities to create lasting impact.',
+    longDescription: 'We believe there are opportunities for innovation in ministry and communithy impact that can unlocked by bringing thought leaders, forward-thinking investors, and young changemakers together. Our Spiritual Innovation Lab identifies promising young leaders and equips them with the resources, mentorship, and funding needed to launch innovative ministry projects that address contemporary challenges in our communities.',
+    image: '/AYP.ME.webp',
+    impact: 'Unlocking Possibilities',
+    location: 'Nationwide',
+    link: '#',
+  },
 ]
 
 export default function Projects() {
@@ -152,7 +153,7 @@ export default function Projects() {
             </h1>
             <div className="w-20 h-0.5 bg-[#c9a227] mx-auto mt-8" />
             <p className="text-white/70 mt-8 max-w-2xl mx-auto text-lg">
-              Each of our projects is designed to create lasting impact, empowering communities and individuals to reach their God-given potential.
+              Each of our partnership projects is designed to create lasting impact, empowering communities and individuals to reach their God-given potential.
             </p>
           </motion.div>
         </div>
