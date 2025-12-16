@@ -10,6 +10,7 @@ import Image from "next/image"
 const navLinks = [
   { name: "Home", path: "/" },
   { name: "Projects", path: "/projects" },
+  { name: "Events", path: "https://events.empowermg.org", external: true },
   { name: "Donate", path: "/donate" },
 ]
 
@@ -59,15 +60,32 @@ export default function HeroSection() {
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => {
               const isActive = pathname === link.path
+              const linkClasses = `text-sm font-medium transition-colors relative group ${
+                showTransparentHeader
+                  ? "text-white/80 hover:text-white"
+                  : "text-gray-600 hover:text-[#1e3a5f]"
+              } ${isActive ? "text-[#c9a227]" : ""}`
+
+              if (link.external) {
+                return (
+                  <a
+                    key={link.name}
+                    href={link.path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkClasses}
+                  >
+                    {link.name}
+                    <span className="absolute -bottom-1 left-0 h-0.5 bg-[#c9a227] transition-all w-0 group-hover:w-full" />
+                  </a>
+                )
+              }
+
               return (
                 <Link
                   key={link.name}
                   href={link.path}
-                  className={`text-sm font-medium transition-colors relative group ${
-                    showTransparentHeader
-                      ? "text-white/80 hover:text-white"
-                      : "text-gray-600 hover:text-[#1e3a5f]"
-                  } ${isActive ? "text-[#c9a227]" : ""}`}
+                  className={linkClasses}
                 >
                   {link.name}
                   <span
@@ -115,16 +133,33 @@ export default function HeroSection() {
             <nav className="max-w-7xl mx-auto px-6 py-6 space-y-4 items-end flex flex-col">
               {navLinks.map((link) => {
                 const isActive = pathname === link.path
+                const linkClasses = `block text-lg font-medium transition-colors text-right ${
+                  showTransparentHeader
+                    ? "text-white/90 hover:text-white"
+                    : "text-gray-700 hover:text-[#1e3a5f]"
+                } ${isActive ? "text-[#c9a227]" : ""}`
+
+                if (link.external) {
+                  return (
+                    <a
+                      key={link.name}
+                      href={link.path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={linkClasses}
+                    >
+                      {link.name}
+                    </a>
+                  )
+                }
+
                 return (
                   <Link
                     key={link.name}
                     href={link.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block text-lg font-medium transition-colors text-right ${
-                      showTransparentHeader
-                        ? "text-white/90 hover:text-white"
-                        : "text-gray-700 hover:text-[#1e3a5f]"
-                    } ${isActive ? "text-[#c9a227]" : ""}`}
+                    className={linkClasses}
                   >
                     {link.name}
                   </Link>
