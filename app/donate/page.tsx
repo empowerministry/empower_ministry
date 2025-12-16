@@ -1,7 +1,9 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion } from 'framer-motion'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -9,60 +11,193 @@ import { Checkbox } from '../components/ui/checkbox'
 import { CreditCard, Lock, Heart, Calendar, Gift, Loader2, Check, ArrowRight, Users, BookOpen, Globe } from 'lucide-react'
 import { toast } from 'sonner'
 import Footer from '../components/Footer'
+import { useSearchParams } from 'next/navigation'
+
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 const presetAmounts = [25, 50, 100, 250, 500, 1000]
 
-export default function Donate() {
+// Payment Form Component (uses Stripe hooks)
+function PaymentForm({
+  amount,
+  donationType,
+  formData,
+  isAnonymous,
+  onSuccess
+}: {
+  amount: number
+  donationType: string
+  formData: { firstName: string; lastName: string; email: string }
+  isAnonymous: boolean
+  onSuccess: () => void
+}) {
+  const stripe = useStripe()
+  const elements = useElements()
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!stripe || !elements) {
+      return
+    }
+
+    setIsProcessing(true)
+    setErrorMessage(null)
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/donate?success=true`,
+        payment_method_data: {
+          billing_details: {
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+          },
+        },
+      },
+    })
+
+    if (error) {
+      setErrorMessage(error.message || 'An error occurred')
+      setIsProcessing(false)
+    } else {
+      onSuccess()
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="p-8 border-b border-gray-100">
+        <div className="flex items-center gap-3 mb-6">
+          <CreditCard className="w-5 h-5 text-[#1e3a5f]" />
+          <h2 className="text-xl font-semibold text-[#1e3a5f]">Payment Details</h2>
+        </div>
+        <PaymentElement
+          options={{
+            layout: 'tabs',
+          }}
+        />
+        {errorMessage && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            {errorMessage}
+          </div>
+        )}
+      </div>
+
+      {/* Submit */}
+      <div className="p-8 bg-gray-50">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p className="text-sm text-gray-500">
+              {donationType === 'monthly' ? 'Monthly donation' : 'One-time donation'}
+            </p>
+            <p className="text-3xl font-semibold text-[#1e3a5f]">
+              ${amount ? amount.toFixed(2) : '0.00'}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-gray-500 text-sm">
+            <Lock className="w-4 h-4" />
+            <span>Secured by Stripe</span>
+          </div>
+        </div>
+        <Button
+          type="submit"
+          disabled={isProcessing || !stripe || !elements}
+          className="w-full h-14 bg-[#c9a227] hover:bg-[#b8922a] text-white rounded-xl text-lg font-medium transition-all"
+        >
+          {isProcessing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <>
+              Complete Donation
+              <Heart className="w-5 h-5 ml-2" />
+            </>
+          )}
+        </Button>
+        <p className="text-center text-sm text-gray-500 mt-4">
+          Your donation is tax-deductible. A receipt will be emailed to you.
+        </p>
+      </div>
+    </form>
+  )
+}
+
+function DonateContent() {
+  const searchParams = useSearchParams()
   const [showForm, setShowForm] = useState(false)
   const [donationType, setDonationType] = useState('one-time')
   const [selectedAmount, setSelectedAmount] = useState(100)
   const [customAmount, setCustomAmount] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [isLoadingPayment, setIsLoadingPayment] = useState(false)
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    cardNumber: '',
-    expiry: '',
-    cvc: '',
-    billingZip: '',
   })
 
   const amount = customAmount ? parseFloat(customAmount) : selectedAmount
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsProcessing(true)
-
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2500))
-
-    setIsProcessing(false)
-    setIsComplete(true)
-    toast.success('Thank you for your generous donation!')
-  }
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-    const matches = v.match(/\d{4,16}/g)
-    const match = (matches && matches[0]) || ''
-    const parts = []
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4))
+  // Check for success/canceled status from Stripe redirect
+  useEffect(() => {
+    if (searchParams.get('success') === 'true') {
+      setIsComplete(true)
+      toast.success('Thank you for your generous donation!')
     }
-    return parts.length ? parts.join(' ') : value
-  }
-
-  const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-    if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4)
+    if (searchParams.get('canceled') === 'true') {
+      toast.error('Payment was canceled. Please try again.')
     }
-    return v
+  }, [searchParams])
+
+  // Create payment intent when user is ready to pay
+  const initializePayment = async () => {
+    if (!formData.firstName || !formData.lastName || !formData.email || !amount) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setIsLoadingPayment(true)
+
+    try {
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          donationType,
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`,
+          isAnonymous,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.error) {
+        toast.error(data.error)
+        setIsLoadingPayment(false)
+        return
+      }
+
+      if (donationType === 'monthly' && data.url) {
+        // Redirect to Stripe Checkout for subscriptions
+        window.location.href = data.url
+      } else if (data.clientSecret) {
+        // Use Payment Element for one-time donations
+        setClientSecret(data.clientSecret)
+      }
+    } catch (error) {
+      toast.error('Failed to initialize payment. Please try again.')
+    }
+
+    setIsLoadingPayment(false)
   }
 
   if (isComplete) {
@@ -81,10 +216,10 @@ export default function Donate() {
             Thank You!
           </h1>
           <p className="text-[#64748b] mb-2">
-            Your {donationType === 'monthly' ? 'monthly' : ''} donation of <span className="font-semibold text-[#1e3a5f]">${amount.toFixed(2)}</span> has been received.
+            Your donation has been received successfully.
           </p>
           <p className="text-[#64748b] mb-8">
-            A confirmation email has been sent to {formData.email}
+            A confirmation email will be sent to you shortly.
           </p>
           <Button
             onClick={() => window.location.href = '/'}
@@ -185,11 +320,11 @@ export default function Donate() {
                 className="mt-10"
               >
                 <Button
-                  onClick={() => setShowForm(false)}
+                  onClick={() => setShowForm(true)}
                   className="bg-[#c9a227] hover:bg-[#b8922a] text-white h-14 px-10 rounded-xl text-lg font-medium"
                 >
                   <Heart className="w-5 h-5 mr-2" />
-                  We're setting up our secure payment system. Please check back shortly.
+                  Donate Now
                 </Button>
               </motion.div>
             )}
@@ -202,247 +337,196 @@ export default function Donate() {
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-            <form onSubmit={handleSubmit}>
-              {/* Donation Type */}
-              <div className="p-8 border-b border-gray-100">
-                <h2 className="text-xl font-semibold text-[#1e3a5f] mb-6">
-                  Choose Donation Type
-                </h2>
+            {/* Donation Type */}
+            <div className="p-8 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-[#1e3a5f] mb-6">
+                Choose Donation Type
+              </h2>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* One-Time Donation */}
-                  <button
-                    type="button"
-                    onClick={() => setDonationType("one-time")}
-                    className={`p-5 rounded-xl border-2 transition-all duration-300
-                      flex flex-col md:flex-row items-center md:items-start
-                      gap-4 text-center md:text-left
-                      ${
+              <div className="grid grid-cols-2 gap-4">
+                {/* One-Time Donation */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDonationType("one-time")
+                    setClientSecret(null)
+                  }}
+                  className={`p-5 rounded-xl border-2 transition-all duration-300
+                    flex flex-col md:flex-row items-center md:items-start
+                    gap-4 text-center md:text-left
+                    ${
+                      donationType === "one-time"
+                        ? "border-[#c9a227] bg-[#c9a227]/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      donationType === "one-time" ? "bg-[#c9a227]/20" : "bg-gray-100"
+                    }`}
+                  >
+                    <Gift
+                      className={`w-5 h-5 ${
+                        donationType === "one-time" ? "text-[#c9a227]" : "text-gray-400"
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <p
+                      className={`font-medium ${
                         donationType === "one-time"
-                          ? "border-[#c9a227] bg-[#c9a227]/5"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                  >
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        donationType === "one-time" ? "bg-[#c9a227]/20" : "bg-gray-100"
+                          ? "text-[#1e3a5f]"
+                          : "text-gray-600"
                       }`}
                     >
-                      <Gift
-                        className={`w-5 h-5 ${
-                          donationType === "one-time" ? "text-[#c9a227]" : "text-gray-400"
-                        }`}
-                      />
-                    </div>
+                      One-Time
+                    </p>
+                    <p className="text-sm text-gray-500">Single donation</p>
+                  </div>
+                </button>
 
-                    <div>
-                      <p
-                        className={`font-medium ${
-                          donationType === "one-time"
-                            ? "text-[#1e3a5f]"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        One-Time
-                      </p>
-                      <p className="text-sm text-gray-500">Single donation</p>
-                    </div>
-                  </button>
+                {/* Monthly Donation */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDonationType("monthly")
+                    setClientSecret(null)
+                  }}
+                  className={`p-5 rounded-xl border-2 transition-all duration-300
+                    flex flex-col md:flex-row items-center md:items-start
+                    gap-4 text-center md:text-left
+                    ${
+                      donationType === "monthly"
+                        ? "border-[#c9a227] bg-[#c9a227]/5"
+                        : "border-gray-200 hover:border-gray-300"
+                    }`}
+                >
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      donationType === "monthly" ? "bg-[#c9a227]/20" : "bg-gray-100"
+                    }`}
+                  >
+                    <Calendar
+                      className={`w-5 h-5 ${
+                        donationType === "monthly" ? "text-[#c9a227]" : "text-gray-400"
+                      }`}
+                    />
+                  </div>
 
-                  {/* Monthly Donation */}
-                  <button
-                    type="button"
-                    onClick={() => setDonationType("monthly")}
-                    className={`p-5 rounded-xl border-2 transition-all duration-300
-                      flex flex-col md:flex-row items-center md:items-start
-                      gap-4 text-center md:text-left
-                      ${
+                  <div>
+                    <p
+                      className={`font-medium ${
                         donationType === "monthly"
-                          ? "border-[#c9a227] bg-[#c9a227]/5"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                  >
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        donationType === "monthly" ? "bg-[#c9a227]/20" : "bg-gray-100"
+                          ? "text-[#1e3a5f]"
+                          : "text-gray-600"
                       }`}
                     >
-                      <Calendar
-                        className={`w-5 h-5 ${
-                          donationType === "monthly" ? "text-[#c9a227]" : "text-gray-400"
-                        }`}
-                      />
-                    </div>
+                      Monthly
+                    </p>
+                    <p className="text-sm text-gray-500">Recurring gift</p>
+                  </div>
+                </button>
+              </div>
+            </div>
 
-                    <div>
-                      <p
-                        className={`font-medium ${
-                          donationType === "monthly"
-                            ? "text-[#1e3a5f]"
-                            : "text-gray-600"
-                        }`}
-                      >
-                        Monthly
-                      </p>
-                      <p className="text-sm text-gray-500">Recurring gift</p>
-                    </div>
+            {/* Amount Selection */}
+            <div className="p-8 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-[#1e3a5f] mb-6">Select Amount</h2>
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-6">
+                {presetAmounts.map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => {
+                      setSelectedAmount(amt)
+                      setCustomAmount('')
+                      setClientSecret(null)
+                    }}
+                    className={`py-4 rounded-xl font-medium transition-all duration-300 ${
+                      selectedAmount === amt && !customAmount
+                        ? 'bg-[#1e3a5f] text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    ${amt}
                   </button>
+                ))}
+              </div>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">$</span>
+                <Input
+                  type="number"
+                  placeholder="Enter custom amount"
+                  value={customAmount}
+                  onChange={(e) => {
+                    setCustomAmount(e.target.value)
+                    setClientSecret(null)
+                  }}
+                  className="pl-8 h-14 text-lg rounded-xl border-gray-200 focus:border-[#c9a227] focus:ring-[#c9a227]"
+                />
+              </div>
+            </div>
+
+            {/* Donor Information */}
+            <div className="p-8 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-[#1e3a5f]">Your Information</h2>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="anonymous"
+                    checked={isAnonymous}
+                    onCheckedChange={(checked) => setIsAnonymous(checked === true)}
+                  />
+                  <Label htmlFor="anonymous" className="text-sm text-gray-600 cursor-pointer">
+                    Make this donation anonymous
+                  </Label>
                 </div>
               </div>
-
-              {/* Amount Selection */}
-              <div className="p-8 border-b border-gray-100">
-                <h2 className="text-xl font-semibold text-[#1e3a5f] mb-6">Select Amount</h2>
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-6">
-                  {presetAmounts.map((amt) => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => {
-                        setSelectedAmount(amt)
-                        setCustomAmount('')
-                      }}
-                      className={`py-4 rounded-xl font-medium transition-all duration-300 ${
-                        selectedAmount === amt && !customAmount
-                          ? 'bg-[#1e3a5f] text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      ${amt}
-                    </button>
-                  ))}
-                </div>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">$</span>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">First Name *</Label>
                   <Input
-                    type="number"
-                    placeholder="Enter custom amount"
-                    value={customAmount}
-                    onChange={(e) => setCustomAmount(e.target.value)}
-                    className="pl-8 h-14 text-lg rounded-xl border-gray-200 focus:border-[#c9a227] focus:ring-[#c9a227]"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    className="h-12 rounded-xl border-gray-200"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Last Name *</Label>
+                  <Input
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    className="h-12 rounded-xl border-gray-200"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Email *</Label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="h-12 rounded-xl border-gray-200"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Phone (optional)</Label>
+                  <Input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="h-12 rounded-xl border-gray-200"
                   />
                 </div>
               </div>
+            </div>
 
-              {/* Donor Information */}
-              <div className="p-8 border-b border-gray-100">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-[#1e3a5f]">Your Information</h2>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="anonymous"
-                      checked={isAnonymous}
-                      onCheckedChange={(checked) => setIsAnonymous(checked === true)}
-                    />
-                    <Label htmlFor="anonymous" className="text-sm text-gray-600 cursor-pointer">
-                      Make this donation anonymous
-                    </Label>
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">First Name</Label>
-                    <Input
-                      value={formData.firstName}
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">Last Name</Label>
-                    <Input
-                      value={formData.lastName}
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">Email</Label>
-                    <Input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">Phone (optional)</Label>
-                    <Input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="h-12 rounded-xl border-gray-200"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment Information */}
-              <div className="p-8 border-b border-gray-100">
-                <div className="flex items-center gap-3 mb-6">
-                  <CreditCard className="w-5 h-5 text-[#1e3a5f]" />
-                  <h2 className="text-xl font-semibold text-[#1e3a5f]">Payment Details</h2>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-sm text-gray-600 mb-2 block">Card Number</Label>
-                    <div className="relative">
-                      <Input
-                        value={formData.cardNumber}
-                        onChange={(e) => setFormData({ ...formData, cardNumber: formatCardNumber(e.target.value) })}
-                        placeholder="1234 5678 9012 3456"
-                        maxLength={19}
-                        className="h-12 rounded-xl border-gray-200 pr-20"
-                        required
-                      />
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
-                        <div className="w-8 h-5 bg-blue-600 rounded text-white text-[8px] flex items-center justify-center font-bold">VISA</div>
-                        <div className="w-8 h-5 bg-red-500 rounded text-white text-[8px] flex items-center justify-center font-bold">MC</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <Label className="text-sm text-gray-600 mb-2 block">Expiry</Label>
-                      <Input
-                        value={formData.expiry}
-                        onChange={(e) => setFormData({ ...formData, expiry: formatExpiry(e.target.value) })}
-                        placeholder="MM/YY"
-                        maxLength={5}
-                        className="h-12 rounded-xl border-gray-200"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm text-gray-600 mb-2 block">CVC</Label>
-                      <Input
-                        type="password"
-                        value={formData.cvc}
-                        onChange={(e) => setFormData({ ...formData, cvc: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                        placeholder="123"
-                        maxLength={4}
-                        className="h-12 rounded-xl border-gray-200"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm text-gray-600 mb-2 block">ZIP Code</Label>
-                      <Input
-                        value={formData.billingZip}
-                        onChange={(e) => setFormData({ ...formData, billingZip: e.target.value })}
-                        placeholder="12345"
-                        className="h-12 rounded-xl border-gray-200"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit */}
+            {/* Payment Section */}
+            {!clientSecret ? (
+              // Show "Continue to Payment" button
               <div className="p-8 bg-gray-50">
                 <div className="flex items-center justify-between mb-6">
                   <div>
@@ -455,20 +539,20 @@ export default function Donate() {
                   </div>
                   <div className="flex items-center gap-2 text-gray-500 text-sm">
                     <Lock className="w-4 h-4" />
-                    <span>Secure payment</span>
+                    <span>Secured by Stripe</span>
                   </div>
                 </div>
                 <Button
-                  type="submit"
-                  disabled={isProcessing || !amount}
+                  onClick={initializePayment}
+                  disabled={isLoadingPayment || !amount}
                   className="w-full h-14 bg-[#c9a227] hover:bg-[#b8922a] text-white rounded-xl text-lg font-medium transition-all"
                 >
-                  {isProcessing ? (
+                  {isLoadingPayment ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      Complete Donation
-                      <Heart className="w-5 h-5 ml-2" />
+                      Continue to Payment
+                      <CreditCard className="w-5 h-5 ml-2" />
                     </>
                   )}
                 </Button>
@@ -476,7 +560,34 @@ export default function Donate() {
                   Your donation is tax-deductible. A receipt will be emailed to you.
                 </p>
               </div>
-            </form>
+            ) : (
+              // Show Stripe Payment Element
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  clientSecret,
+                  appearance: {
+                    theme: 'stripe',
+                    variables: {
+                      colorPrimary: '#c9a227',
+                      colorBackground: '#ffffff',
+                      colorText: '#1e3a5f',
+                      colorDanger: '#df1b41',
+                      fontFamily: 'system-ui, sans-serif',
+                      borderRadius: '12px',
+                    },
+                  },
+                }}
+              >
+                <PaymentForm
+                  amount={amount}
+                  donationType={donationType}
+                  formData={formData}
+                  isAnonymous={isAnonymous}
+                  onSuccess={() => setIsComplete(true)}
+                />
+              </Elements>
+            )}
           </div>
         </div>
       </section>
@@ -484,5 +595,17 @@ export default function Donate() {
 
       <Footer />
     </div>
+  )
+}
+
+export default function Donate() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#c9a227]" />
+      </div>
+    }>
+      <DonateContent />
+    </Suspense>
   )
 }
