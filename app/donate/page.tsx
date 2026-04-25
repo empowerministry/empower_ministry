@@ -47,7 +47,10 @@ function PaymentForm({
     setIsProcessing(true)
     setErrorMessage(null)
 
-    const { error } = await stripe.confirmPayment({
+    // redirect: 'if_required' keeps the donor on this page when no 3DS step
+    // is needed. 3DS-required cards still redirect to return_url and the
+    // existing useEffect on ?success=true handles the return.
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/donate?success=true`,
@@ -58,13 +61,28 @@ function PaymentForm({
           },
         },
       },
+      redirect: 'if_required',
     })
 
     if (error) {
       setErrorMessage(error.message || 'An error occurred')
       setIsProcessing(false)
-    } else {
+      return
+    }
+
+    // 'succeeded' = card cleared synchronously.
+    // 'processing' = async method (e.g. ACH); Stripe settles in background.
+    if (
+      paymentIntent?.status === 'succeeded' ||
+      paymentIntent?.status === 'processing'
+    ) {
       onSuccess()
+    } else {
+      // Unexpected non-error, non-success state. Re-enable the button so the
+      // donor can retry. This should be rare (e.g. requires_action without
+      // a redirect, which 'if_required' usually handles for us).
+      setErrorMessage('Payment did not complete. Please try again.')
+      setIsProcessing(false)
     }
   }
 
