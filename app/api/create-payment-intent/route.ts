@@ -66,6 +66,23 @@ export async function POST(request: Request) {
         },
       })
 
+      // Stripe's typings allow `latest_invoice` to be a string (the invoice
+      // ID, if expansion silently failed), null, or an expanded Invoice. We
+      // need it to be an object before the intersection cast below is sound.
+      if (
+        typeof subscription.latest_invoice !== 'object' ||
+        subscription.latest_invoice === null
+      ) {
+        console.error('Subscription latest_invoice was not expanded', {
+          subscriptionId: subscription.id,
+          latestInvoiceType: typeof subscription.latest_invoice,
+        })
+        return NextResponse.json(
+          { error: 'Could not initialize subscription payment' },
+          { status: 500 }
+        )
+      }
+
       // In Stripe SDK v20 with the default API version, the first invoice's
       // PaymentIntent client_secret lives at `latest_invoice.confirmation_secret`
       // (not at `latest_invoice.payment_intent` as in older API versions).
@@ -77,8 +94,9 @@ export async function POST(request: Request) {
       const clientSecret = invoice.confirmation_secret?.client_secret ?? null
 
       if (!clientSecret) {
-        console.error('Subscription has no confirmation_secret', {
+        console.error('Subscription invoice has no confirmation_secret', {
           subscriptionId: subscription.id,
+          invoiceId: invoice.id,
         })
         return NextResponse.json(
           { error: 'Could not initialize subscription payment' },
