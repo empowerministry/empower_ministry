@@ -92,6 +92,7 @@ function PaymentForm({
   return (
     <form onSubmit={handleSubmit}>
       <div className="p-8 border-b border-gray-100">
+        <h2 className="sr-only">Payment method</h2>
         <PaymentElement options={{ layout: 'tabs' }} />
         {errorMessage && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
