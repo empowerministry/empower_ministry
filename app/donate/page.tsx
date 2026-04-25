@@ -170,6 +170,35 @@ function DonateContent() {
     }
   }, [searchParams])
 
+  // Watchdog: if we have a clientSecret but the Element does not visibly
+  // mount within 5s (e.g. ad-blocker, network failure, Stripe.js blocked),
+  // surface a fallback message so the donor isn't stuck.
+  const [stripeLoadFailed, setStripeLoadFailed] = useState(false)
+
+  // Reset stripeLoadFailed when clientSecret changes (e.g. donor adjusts
+  // amount or clicks Try Again). Per React docs, "adjust state on prop
+  // change" runs during render — not in an effect — to avoid the
+  // react-hooks/set-state-in-effect rule.
+  // https://react.dev/reference/react/useState#storing-information-from-previous-renders
+  const [trackedClientSecret, setTrackedClientSecret] = useState(clientSecret)
+  if (trackedClientSecret !== clientSecret) {
+    setTrackedClientSecret(clientSecret)
+    setStripeLoadFailed(false)
+  }
+
+  useEffect(() => {
+    if (!clientSecret) return
+    const timeoutId = setTimeout(() => {
+      // Heuristic: if Stripe.js loaded, an iframe with name starting with
+      // "__privateStripeFrame" will be present. If not, show fallback.
+      const mounted = document.querySelector('iframe[name^="__privateStripeFrame"]')
+      if (!mounted) {
+        setStripeLoadFailed(true)
+      }
+    }, 5000)
+    return () => clearTimeout(timeoutId)
+  }, [clientSecret])
+
   // Create a PaymentIntent (one-time) or incomplete Subscription (monthly).
   // Both paths now return { clientSecret } and render the same Payment Element.
   const initializePayment = async () => {
@@ -586,6 +615,23 @@ function DonateContent() {
                 <p className="text-center text-sm text-gray-500 mt-4">
                   Your donation is tax-deductible. A receipt will be emailed to you.
                 </p>
+              </div>
+            ) : stripeLoadFailed ? (
+              <div className="p-8 bg-gray-50">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm mb-4">
+                  We couldn&apos;t load the secure payment form. This is often
+                  caused by an ad-blocker or network issue. Try disabling
+                  extensions and reloading, or contact us for help.
+                </div>
+                <Button
+                  onClick={() => {
+                    setClientSecret(null)
+                    setStripeLoadFailed(false)
+                  }}
+                  className="w-full h-14 bg-[#c9a227] hover:bg-[#b8922a] text-white rounded-xl text-lg font-medium"
+                >
+                  Try Again
+                </Button>
               </div>
             ) : (
               // Show Stripe Payment Element
