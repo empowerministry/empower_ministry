@@ -179,7 +179,15 @@ function DonateContent() {
         }),
       })
 
-      const data = await response.json()
+      // Parse defensively — proxies and CDNs can return non-JSON bodies on
+      // error pages, and we don't want a SyntaxError to swallow the
+      // server's structured error message.
+      let data: { clientSecret?: string; error?: string } = {}
+      try {
+        data = await response.json()
+      } catch {
+        // body wasn't JSON — leave data as {} and fall through to error handling
+      }
 
       if (!response.ok || data.error) {
         toast.error(data.error || 'Could not initialize payment')
@@ -193,6 +201,7 @@ function DonateContent() {
         toast.error('Unexpected response from server')
       }
     } catch (error) {
+      console.error('initializePayment failed:', error)
       const offline = typeof navigator !== 'undefined' && !navigator.onLine
       toast.error(
         offline
