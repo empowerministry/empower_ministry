@@ -5,28 +5,46 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: Request) {
   try {
-    const { amount, donationType, email, name, isAnonymous } = await request.json()
+    const body = await request.json()
+    const {
+      amount,
+      donationType,
+      isAnonymous,
+    }: {
+      amount: unknown
+      donationType: unknown
+      isAnonymous: unknown
+    } = body
 
-    if (typeof amount !== 'number' || amount < 1 || amount > 1_000_000) {
+    if (
+      typeof amount !== 'number' ||
+      !Number.isFinite(amount) ||
+      amount < 1 ||
+      amount > 1_000_000
+    ) {
       return NextResponse.json(
         { error: 'Invalid amount' },
         { status: 400 }
       )
     }
 
-    if (typeof email !== 'string' || !email.includes('@')) {
+    const rawEmail = body.email
+    if (typeof rawEmail !== 'string' || !rawEmail.trim().includes('@')) {
       return NextResponse.json(
         { error: 'Invalid email' },
         { status: 400 }
       )
     }
+    const email = rawEmail.trim()
 
-    if (typeof name !== 'string' || name.trim().length === 0) {
+    const rawName = body.name
+    if (typeof rawName !== 'string' || rawName.trim().length === 0) {
       return NextResponse.json(
         { error: 'Name is required' },
         { status: 400 }
       )
     }
+    const name = rawName.trim()
 
     if (donationType !== 'monthly' && donationType !== 'one-time') {
       return NextResponse.json(
