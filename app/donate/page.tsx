@@ -156,7 +156,8 @@ function DonateContent() {
     }
   }, [searchParams])
 
-  // Create payment intent when user is ready to pay
+  // Create a PaymentIntent (one-time) or incomplete Subscription (monthly).
+  // Both paths now return { clientSecret } and render the same Payment Element.
   const initializePayment = async () => {
     if (!formData.firstName || !formData.lastName || !formData.email || !amount) {
       toast.error('Please fill in all required fields')
@@ -180,21 +181,24 @@ function DonateContent() {
 
       const data = await response.json()
 
-      if (data.error) {
-        toast.error(data.error)
+      if (!response.ok || data.error) {
+        toast.error(data.error || 'Could not initialize payment')
         setIsLoadingPayment(false)
         return
       }
 
-      if (donationType === 'monthly' && data.url) {
-        // Redirect to Stripe Checkout for subscriptions
-        window.location.href = data.url
-      } else if (data.clientSecret) {
-        // Use Payment Element for one-time donations
+      if (data.clientSecret) {
         setClientSecret(data.clientSecret)
+      } else {
+        toast.error('Unexpected response from server')
       }
     } catch (error) {
-      toast.error('Failed to initialize payment. Please try again.')
+      const offline = typeof navigator !== 'undefined' && !navigator.onLine
+      toast.error(
+        offline
+          ? 'You appear to be offline. Check your connection and try again.'
+          : 'Failed to initialize payment. Please try again.'
+      )
     }
 
     setIsLoadingPayment(false)
