@@ -201,18 +201,30 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
         metadata: { isAnonymous: isAnonymous ? 'true' : 'false' },
       })
 
+      // Stripe's subscriptions.create requires an existing Product on
+      // price_data.product (unlike Checkout Sessions, which accept inline
+      // product_data). We create one Product per request — Stripe Dashboard
+      // will show one Product per donor. The Product description carries
+      // donor identity so each is distinguishable.
+      const product = await stripe.products.create({
+        name: 'Monthly Donation to Empower Ministry Group',
+        description: isAnonymous
+          ? 'Anonymous monthly donation'
+          : `Monthly donation from ${name}`,
+        metadata: {
+          donationType: 'monthly',
+          donorName: isAnonymous ? 'Anonymous' : name,
+          isAnonymous: isAnonymous ? 'true' : 'false',
+        },
+      })
+
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [
           {
             price_data: {
               currency: 'usd',
-              product_data: {
-                name: 'Monthly Donation to Empower Ministry Group',
-                description: isAnonymous
-                  ? 'Anonymous monthly donation'
-                  : `Monthly donation from ${name}`,
-              },
+              product: product.id,
               unit_amount: amountInCents,
               recurring: { interval: 'month' },
             },
@@ -228,8 +240,13 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
         },
       })
 
-      const invoice = subscription.latest_invoice as Stripe.Invoice
-      const intent = invoice.payment_intent as Stripe.PaymentIntent
+      // Stripe SDK v20 types do not include `payment_intent` on Invoice by
+      // default (it's runtime-present via the `expand` above). The
+      // intersection assertion bridges the gap.
+      const invoice = subscription.latest_invoice as Stripe.Invoice & {
+        payment_intent: Stripe.PaymentIntent | null
+      }
+      const intent = invoice.payment_intent as Stripe.PaymentIntent | null
 
       if (!intent?.client_secret) {
         console.error('Subscription has no PaymentIntent client_secret', {
@@ -249,21 +266,17 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
     } else {
 ```
 
-- [ ] **Step 2: Type-check + lint**
+- [ ] **Step 2: Type-check**
 
 Run:
 ```bash
-cd /Users/davidkim/repos/empower_ministry && npm run lint && npx tsc --noEmit
+cd /Users/davidkim/repos/empower_ministry && npx tsc --noEmit
 ```
 Expected: no errors.
 
-If TypeScript complains that `payment_intent` is not a property on `Invoice`, that means the installed Stripe SDK API version pinned in your account dashboard renamed it. In that case, change the two type assertion lines to:
-```ts
-const invoice = subscription.latest_invoice as Stripe.Invoice & {
-  payment_intent: Stripe.PaymentIntent | null
-}
-const intent = invoice.payment_intent as Stripe.PaymentIntent
-```
+(`npm run lint` baseline has pre-existing errors in unrelated files — only verify the file you touched produces no new errors via `npx eslint app/api/create-payment-intent/route.ts`.)
+
+The intersection-type assertion on `latest_invoice` (shown in Step 1's "After" block) is required for Stripe SDK v20 — that SDK version does not include `payment_intent` on `Invoice` by default; it's runtime-present via the `expand: ['latest_invoice.payment_intent']` array. The assertion bridges the runtime/type gap.
 
 - [ ] **Step 3: Smoke-test the endpoint**
 
