@@ -7,9 +7,30 @@ export async function POST(request: Request) {
   try {
     const { amount, donationType, email, name, isAnonymous } = await request.json()
 
-    if (!amount || amount < 1) {
+    if (typeof amount !== 'number' || amount < 1 || amount > 1_000_000) {
       return NextResponse.json(
         { error: 'Invalid amount' },
+        { status: 400 }
+      )
+    }
+
+    if (typeof email !== 'string' || !email.includes('@')) {
+      return NextResponse.json(
+        { error: 'Invalid email' },
+        { status: 400 }
+      )
+    }
+
+    if (typeof name !== 'string' || name.trim().length === 0) {
+      return NextResponse.json(
+        { error: 'Name is required' },
+        { status: 400 }
+      )
+    }
+
+    if (donationType !== 'monthly' && donationType !== 'one-time') {
+      return NextResponse.json(
+        { error: 'Invalid donation type' },
         { status: 400 }
       )
     }
