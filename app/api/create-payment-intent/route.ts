@@ -18,37 +18,79 @@ export async function POST(request: Request) {
     const amountInCents = Math.round(amount * 100)
 
     if (donationType === 'monthly') {
-      // For recurring donations, create a checkout session with subscription
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        mode: 'subscription',
-        customer_email: email,
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Monthly Donation to Empower Ministry Group',
-                description: isAnonymous ? 'Anonymous monthly donation' : `Monthly donation from ${name}`,
-              },
-              unit_amount: amountInCents,
-              recurring: {
-                interval: 'month',
-              },
-            },
-            quantity: 1,
-          },
-        ],
-        success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/donate?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/donate?canceled=true`,
+      // For recurring donations, use the incomplete-subscription pattern so
+      // the donor can confirm payment via the embedded Payment Element on
+      // our own page (no Checkout redirect).
+      const customer = await stripe.customers.create({
+        email,
+        name: isAnonymous ? undefined : name,
+        metadata: { isAnonymous: isAnonymous ? 'true' : 'false' },
+      })
+
+      // Stripe's subscriptions.create requires an existing Product on
+      // price_data.product (unlike Checkout Sessions, which accept inline
+      // product_data). We create one Product per request — Stripe Dashboard
+      // will show one Product per donor. The Product description carries
+      // donor identity so each is distinguishable.
+      const product = await stripe.products.create({
+        name: 'Monthly Donation to Empower Ministry Group',
+        description: isAnonymous
+          ? 'Anonymous monthly donation'
+          : `Monthly donation from ${name}`,
         metadata: {
           donationType: 'monthly',
-          isAnonymous: isAnonymous ? 'true' : 'false',
           donorName: isAnonymous ? 'Anonymous' : name,
+          isAnonymous: isAnonymous ? 'true' : 'false',
         },
       })
 
-      return NextResponse.json({ sessionId: session.id, url: session.url })
+      const subscription = await stripe.subscriptions.create({
+        customer: customer.id,
+        items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product: product.id,
+              unit_amount: amountInCents,
+              recurring: { interval: 'month' },
+            },
+          },
+        ],
+        payment_behavior: 'default_incomplete',
+        payment_settings: { save_default_payment_method: 'on_subscription' },
+        expand: ['latest_invoice.confirmation_secret'],
+        metadata: {
+          donationType: 'monthly',
+          donorName: isAnonymous ? 'Anonymous' : name,
+          isAnonymous: isAnonymous ? 'true' : 'false',
+        },
+      })
+
+      // In Stripe SDK v20 with the default API version, the first invoice's
+      // PaymentIntent client_secret lives at `latest_invoice.confirmation_secret`
+      // (not at `latest_invoice.payment_intent` as in older API versions).
+      // The Stripe TS types do not yet include this field; the intersection
+      // assertion bridges the gap.
+      const invoice = subscription.latest_invoice as Stripe.Invoice & {
+        confirmation_secret: { client_secret: string; type: string } | null
+      }
+      const clientSecret = invoice.confirmation_secret?.client_secret ?? null
+
+      if (!clientSecret) {
+        console.error('Subscription has no confirmation_secret', {
+          subscriptionId: subscription.id,
+        })
+        return NextResponse.json(
+          { error: 'Could not initialize subscription payment' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        clientSecret,
+        donationType: 'monthly',
+        subscriptionId: subscription.id,
+      })
     } else {
       // For one-time donations, create a PaymentIntent. Stripe sends its
       // built-in receipt automatically when receipt_email is set.
