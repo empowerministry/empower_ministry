@@ -232,7 +232,7 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
         ],
         payment_behavior: 'default_incomplete',
         payment_settings: { save_default_payment_method: 'on_subscription' },
-        expand: ['latest_invoice.payment_intent'],
+        expand: ['latest_invoice.confirmation_secret'],
         metadata: {
           donationType: 'monthly',
           donorName: isAnonymous ? 'Anonymous' : name,
@@ -240,16 +240,18 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
         },
       })
 
-      // Stripe SDK v20 types do not include `payment_intent` on Invoice by
-      // default (it's runtime-present via the `expand` above). The
-      // intersection assertion bridges the gap.
+      // In Stripe SDK v20 with the default API version, the first invoice's
+      // PaymentIntent client_secret lives at `latest_invoice.confirmation_secret`
+      // (not at `latest_invoice.payment_intent` as in older API versions).
+      // The Stripe TS types do not yet include this field; the intersection
+      // assertion bridges the gap.
       const invoice = subscription.latest_invoice as Stripe.Invoice & {
-        payment_intent: Stripe.PaymentIntent | null
+        confirmation_secret: { client_secret: string; type: string } | null
       }
-      const intent = invoice.payment_intent as Stripe.PaymentIntent | null
+      const clientSecret = invoice.confirmation_secret?.client_secret ?? null
 
-      if (!intent?.client_secret) {
-        console.error('Subscription has no PaymentIntent client_secret', {
+      if (!clientSecret) {
+        console.error('Subscription has no confirmation_secret', {
           subscriptionId: subscription.id,
         })
         return NextResponse.json(
@@ -259,7 +261,7 @@ In the same file, find the `if (donationType === 'monthly')` block (starts aroun
       }
 
       return NextResponse.json({
-        clientSecret: intent.client_secret,
+        clientSecret,
         donationType: 'monthly',
         subscriptionId: subscription.id,
       })
