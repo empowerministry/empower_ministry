@@ -70,11 +70,14 @@ function PaymentForm({
       return
     }
 
+    // After the early return on `error`, the PaymentIntentResult union narrows
+    // and `paymentIntent` is guaranteed defined — plain `.` makes that intent
+    // explicit and surfaces any future SDK type regression immediately.
     // 'succeeded' = card cleared synchronously.
     // 'processing' = async method (e.g. ACH); Stripe settles in background.
     if (
-      paymentIntent?.status === 'succeeded' ||
-      paymentIntent?.status === 'processing'
+      paymentIntent.status === 'succeeded' ||
+      paymentIntent.status === 'processing'
     ) {
       onSuccess()
     } else {
