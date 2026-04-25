@@ -610,7 +610,7 @@ function DonateContent() {
                       borderRadius: '12px',
                       colorPrimary: '#c9a227',
                       colorText: '#1e3a5f',
-                      colorTextSecondary: '#64748b',
+                      colorTextSecondary: '#6b7280',
                       colorTextPlaceholder: '#9ca3af',
                       colorBackground: '#ffffff',
                       colorDanger: '#dc2626',
@@ -620,7 +620,7 @@ function DonateContent() {
                     },
                     rules: {
                       '.Label': {
-                        color: '#64748b',
+                        color: '#4b5563',
                         fontSize: '14px',
                         fontWeight: '400',
                         marginBottom: '8px',
@@ -644,6 +644,10 @@ function DonateContent() {
                         border: '1px solid #e5e7eb',
                         borderRadius: '12px',
                         padding: '12px',
+                      },
+                      '.Tab:hover': {
+                        borderColor: '#c9a227',
+                        backgroundColor: 'rgba(201, 162, 39, 0.03)',
                       },
                       '.Tab--selected': {
                         borderColor: '#c9a227',
