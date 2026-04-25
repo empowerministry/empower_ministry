@@ -195,7 +195,8 @@ function DonateContent() {
       if (!mounted) {
         setStripeLoadFailed(true)
       }
-    }, 5000)
+    }, 10000) // 10s — covers slow connections; false positives would orphan
+              // incomplete Subscriptions in Stripe for monthly donors.
     return () => clearTimeout(timeoutId)
   }, [clientSecret])
 
