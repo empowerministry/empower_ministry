@@ -50,13 +50,13 @@ export async function POST(request: Request) {
 
       return NextResponse.json({ sessionId: session.id, url: session.url })
     } else {
-      // For one-time donations, create a payment intent
+      // For one-time donations, create a PaymentIntent. Stripe sends its
+      // built-in receipt automatically when receipt_email is set.
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amountInCents,
         currency: 'usd',
-        automatic_payment_methods: {
-          enabled: true,
-        },
+        automatic_payment_methods: { enabled: true },
+        receipt_email: email,
         metadata: {
           donationType: 'one-time',
           isAnonymous: isAnonymous ? 'true' : 'false',
@@ -65,7 +65,10 @@ export async function POST(request: Request) {
         },
       })
 
-      return NextResponse.json({ clientSecret: paymentIntent.client_secret })
+      return NextResponse.json({
+        clientSecret: paymentIntent.client_secret,
+        donationType: 'one-time',
+      })
     }
   } catch (error) {
     console.error('Payment error:', error)
