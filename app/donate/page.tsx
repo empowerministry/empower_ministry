@@ -133,7 +133,7 @@ function PaymentForm({
             <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <>
-              Complete Donation
+              {donationType === 'monthly' ? 'Start Monthly Donation' : 'Complete Donation'}
               <Heart className="w-5 h-5 ml-2" />
             </>
           )}
