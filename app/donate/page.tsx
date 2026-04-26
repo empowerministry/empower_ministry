@@ -339,7 +339,7 @@ function DonateContent() {
                 </div>
                 <h3 className="font-semibold text-[#1e3a5f] mb-2">Community Programs</h3>
                 <p className="text-sm text-[#64748b]">
-                  Feed families, provide shelter resources, and deliver essential support to underserved neighborhoods.
+                  Empower ministries to provide essential community support to underserved areas and populations.
                 </p>
               </div>
 
