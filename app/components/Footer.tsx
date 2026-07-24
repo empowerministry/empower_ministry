@@ -208,13 +208,13 @@ export default function Footer() {
 
             {/* Social */}
             <div className="flex items-center gap-3">
-              <a href="https://www.facebook.com/eckcm/" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
+              <a href="https://www.facebook.com/empowermgi" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="https://www.instagram.com/eckcm.em/" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
+              <a href="https://www.instagram.com/_empowermgi/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="https://www.youtube.com/@ECKCM-fz8bc" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
+              <a href="https://www.youtube.com/@empowermgi" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-[#c9a227] hover:text-white transition-all">
                 <Youtube className="w-4 h-4" />
               </a>
             </div>
