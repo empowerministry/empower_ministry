@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Home", path: "/" },
   { name: "Projects", path: "/projects" },
   { name: "Events", path: "https://events.empowermg.org", external: true },
+  { name: "Hub", path: "https://hub.empowermg.org", external: true },
   { name: "Donate", path: "/donate" },
 ]
 
