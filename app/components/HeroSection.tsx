@@ -7,11 +7,18 @@ import { ChevronDown } from 'lucide-react'
 
 const slides = [
   '/AYP.ME.png',
+  '/hero-health-clinic.jpg',
   '/eckcm.webp',
+  '/hero-worship-night.jpg',
   '/guitar.jpeg',
+  '/hero-campus-walk.jpg',
   '/AYP.ME2.png',
+  '/hero-dental-care.jpg',
   '/XAN01441.webp',
+  '/hero-fellowship.jpg',
   '/XAN01589.webp',
+  '/hero-band-rehearsal.webp',
+  '/hero-kitchen-serving.webp',
 ]
 
 export default function HeroSection() {
