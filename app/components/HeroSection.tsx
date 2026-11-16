@@ -6,13 +6,13 @@ import { ChevronDown } from 'lucide-react'
 
 
 const slides = [
-  '/AYP.ME.png',
+  '/AYP.ME.jpg',
   '/hero-health-clinic.jpg',
   '/eckcm.webp',
   '/hero-worship-night.jpg',
   '/guitar.jpeg',
   '/hero-campus-walk.jpg',
-  '/AYP.ME2.png',
+  '/AYP.ME2.jpg',
   '/hero-dental-care.jpg',
   '/XAN01441.webp',
   '/hero-fellowship.jpg',
