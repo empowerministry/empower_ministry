@@ -14,7 +14,7 @@ const slides = [
   '/hero-campus-walk.jpg',
   '/AYP.ME2.jpg',
   '/hero-dental-care.jpg',
-  '/XAN01441.webp',
+  '/XAN01441.jpg',
   '/hero-fellowship.jpg',
   '/XAN01589.webp',
   '/hero-band-rehearsal.webp',
